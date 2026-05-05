@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perspective — Depth-Driven Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Oswald:wght@500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00BD7D;
+            --success: #16A34A;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --surface: #FFFFFF;
+            --text: #111827;
+            --bg: #F9FAFB;
+            --muted: #6B7280;
+            
+            --s1: 4px;
+            --s2: 8px;
+            --s3: 12px;
+            --s4: 16px;
+            --s6: 24px;
+            --s8: 32px;
+            
+            --shadow-1: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-2: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-3: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-4: 0 20px 25px rgba(0,0,0,0.15);
+            
+            --r-card: 12px;
+            --r-btn: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html { -webkit-font-smoothing: antialiased; }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            min-height: 100vh;
+        }
+
+        h1, h2 {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+        
+        h1 { font-size: 32px; }
+        h2 { font-size: 24px; font-weight: 500; }
+        h3 { font-size: 20px; font-weight: 600; }
+        
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        
+        :focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Top Nav */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            height: 64px;
+            background: var(--surface);
+            box-shadow: var(--shadow-1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--s6);
+            gap: var(--s4);
+        }
+        
+        .nav-left { display: flex; align-items: center; gap: var(--s4); }
+        
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+        
+        .logo span { color: var(--primary); }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--r-btn);
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 20px;
+        }
+        .menu-toggle:hover { background: var(--bg); color: var(--text); }
+
+        .tabs {
+            display: flex;
+            gap: var(--s1);
+            background: var(--bg);
+            padding: var(--s1);
+            border-radius: 10px;
+        }
+        
+        .tab-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow-1);
+        }
+        
+        .tab-btn:hover:not(.active) { color: var(--text); }
+
+        /* Layout */
+        .app {
+            display: flex;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 64px;
+            height: calc(100vh - 64px);
+            padding: var(--s6) var(--s4);
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+            padding: var(--s3) var(--s4);
+            margin-bottom: var(--s1);
+            border-radius: var(--r-btn);
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover { background: var(--surface); color: var(--text); box-shadow: var(--shadow-1); }
+        .nav-item.active { background: var(--surface); color: var(--primary); box-shadow: var(--shadow-2); }
+        .nav-item svg { width: 18px; height: 18px; opacity: 0.8; }
+        
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: var(--s8) var(--s6);
+        }
+        
+        .mobile-tabs { display: none; margin-bottom: var(--s6); }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--r-card);
+            box-shadow: var(--shadow-2);
+            padding: var(--s6);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        
+        .card:hover { box-shadow: var(--shadow-3); }
+        
+        /* Hero */
+        .hero {
+            padding: var(--s8);
+            margin-bottom: var(--s8);
+            background: radial-gradient(800px 300px at 85% -10%, rgba(0,189,125,0.12), transparent 60%), var(--surface);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero h1 { margin-bottom: var(--s3); max-width: 640px; }
+        .hero p { color: var(--muted); max-width: 520px; margin-bottom: var(--s6); font-size: 16px; }
+        
+        .hero-actions { display: flex; gap: var(--s3); flex-wrap: wrap; }
+        
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: var(--r-btn);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--s2);
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--text);
+            box-shadow: var(--shadow-1);
+        }
+        .btn-primary:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: var(--shadow-1);
+        }
+        .btn-secondary:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--s6);
+            margin-bottom: var(--s8);
+        }
+        
+        .stat-card { padding: var(--s6); cursor: default; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-3); }
+        
+        .stat-label { font-size: 14px; color: var(--muted); margin-bottom: var(--s2); }
+        .stat-value { font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 500; line-height: 1; margin-bottom: var(--s3); }
+        .stat-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 6px; background: var(--bg); }
+        .stat-trend.up { color: var(--success); background: rgba(22,163,74,0.1); }
+        .stat-trend.down { color: var(--danger); background: rgba(220,38,38,0.1); }
+
+        /* Section */
+        .section { margin-bottom: var(--s8); }
+        .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s4); gap: var(--s4); }
+        .section-title { font-size: 20px; font-weight: 600; }
+        .section-desc { font-size: 14px; color: var(--muted); }
+
+        /* Table */
+        .table-card { padding: 0; overflow: hidden; }
+        .table-head {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 100px;
+            padding: var(--s4) var(--s6);
+            border-bottom: 1px solid var(--bg);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .table-body { padding: var(--s2) 0; }
+        .table-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 100px;
+            align-items: center;
+            padding: var(--s3) var(--s6);
+            margin: 0 var(--s2);
+            border-radius: 8px;
+            transition: background 0.15s;
+            font-size: 14px;
+        }
+        .table-row:hover { background: var(--bg); }
+        .table-row > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 999px;
+            line-height: 1;
+        }
+        .badge-success { background: rgba(22,163,74,0.12); color: #0f6e32; }
+        .badge-warning { background: rgba(217,119,6,0.12); color: #92400e; }
+        .badge-danger { background: rgba(220,38,38,0.12); color: #991b1b; }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg);
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+
+        .avatar-stack { display: flex; align-items: center; }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            border: 2px solid var(--surface);
+            box-shadow: var(--shadow-1);
+            margin-left: -8px;
+        }
+        .avatar:first-child { margin-left: 0; }
+
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); }
+        .form-group { margin-bottom: var(--s4); }
+        .form-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: var(--s2); color: var(--text); }
+        
+        .input, .select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: none;
+            border-radius: var(--r-btn);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            transition: box-shadow 0.2s;
+        }
+        .input::placeholder { color: var(--muted); }
+        .input:focus, .select:focus { outline: 2px solid var(--primary); outline-offset: 0; box-shadow: 0 0 0 4px rgba(0,189,125,0.15); }
+        
+        .checkbox-wrap { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s6); }
+        .checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--bg);
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .checkbox:checked { background: var(--primary); }
+        .checkbox:checked::after {
+            content: '';
+            width: 10px;
+            height: 6px;
+            border: 2px solid var(--text);
+            border-top: none;
+            border-right: none;
+            transform: rotate(-45deg) translateY(-1px);
+        }
+        .checkbox:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        /* Code */
+        .code-block {
+            background: #0B1220;
+            color: #E5E7EB;
+            padding: var(--s6);
+            border-radius: var(--r-card);
+            box-shadow: var(--shadow-3);
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .code-block .comment { color: #6B7280; }
+        .code-block .prop { color: #93C5FD; }
+        .code-block .val { color: #86EFAC; }
+
+        /* Showcase grid */
+        .showcase { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s6); }
+        .showcase-item h4 { font-size: 14px; font-weight: 600; margin-bottom: var(--s3); color: var(--muted); }
+        .showcase-row { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17,24,39,0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--s4);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal {
+            background: var(--surface);
+            border-radius: var(--r-card);
+            box-shadow: var(--shadow-4);
+            width: 100%;
+            max-width: 480px;
+            padding: var(--s8);
+            transform: translateY(16px) scale(0.96);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+        .modal h2 { margin-bottom: var(--s3); }
+        .modal p { color: var(--muted); margin-bottom: var(--s6); font-size: 14px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: var(--s3); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: var(--s6);
+            right: var(--s6);
+            background: var(--text);
+            color: white;
+            padding: var(--s3) var(--s4);
+            border-radius: var(--r-card);
+            box-shadow: var(--shadow-4);
+            display: flex;
+            align-items: center;
+            gap: var(--s3);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 90;
+            transform: translateY(calc(100% + var(--s6)));
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-width: calc(100vw - 32px);
+        }
+        .toast.show { transform: translateY(0); }
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: grid;
+            place-items: center;
+            color: var(--text);
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tab-panel { display: none; animation: fade 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .showcase { grid-template-columns: 1fr 1fr; }
+        }
+        
+        @media (max-width: 860px) {
+            .menu-toggle { display: grid; place-items: center; }
+            .top-nav .tabs { display: none; }
+            .mobile-tabs { display: block; }
+            
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 64px;
+                background: var(--surface);
+                box-shadow: var(--shadow-3);
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+                z-index: 30;
+                width: 260px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            
+            .main { padding: var(--s6) var(--s4); }
+            .hero { padding: var(--s6); }
+            .stats { grid-template-columns: 1fr; gap: var(--s4); }
+            .showcase { grid-template-columns: 1fr; }
+            .table-head, .table-row { grid-template-columns: 1.2fr 0.8fr 0.8fr 80px; padding-left: var(--s4); padding-right: var(--s4); }
+        }
+        
+        @media (max-width: 480px) {
+            .top-nav { padding: 0 var(--s4); }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .btn { justify-content: center; }
+            .toast { left: var(--s4); right: var(--s4); bottom: var(--s4); }
+        }
+
+        /* Sidebar backdrop */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 64px 0 0 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+        .sidebar-backdrop.active { opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body>
+    <header class="top-nav">
+        <div class="nav-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+            <div class="logo">Perspective<span>.</span></div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="components">Components</button>
+        </div>
+        
+        <div>
+            <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">v1.0</button>
+        </div>
+    </header>
+
+    <div class="sidebar-backdrop" id="backdrop"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <a class="nav-item active">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </a>
+                <a class="nav-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+                    Projects
+                </a>
+                <a class="nav-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    Analytics
+                </a>
+                <a class="nav-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Settings
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="mobile-tabs">
+                <div class="tabs" style="width: 100%;">
+                    <button class="tab-btn active" data-tab="overview" style="flex:1; text-align:center;">Overview</button>
+                    <button class="tab-btn" data-tab="components" style="flex:1; text-align:center;">Components</button>
+                </div>
+            </div>
+
+            <!-- OVERVIEW -->
+            <section id="overview" class="tab-panel active">
+                <div class="card hero">
+                    <h1>Design with depth, not decoration.</h1>
+                    <p>Perspective is a depth-driven system where elevation, not borders, creates hierarchy. Important elements sit closer to you.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" id="openModal">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Open Modal
+                        </button>
+                        <button class="btn btn-secondary" id="showToastBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            Show Toast
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="card stat-card">
+                        <div class="stat-label">Active Projects</div>
+                        <div class="stat-value">24</div>
+                        <span class="stat-trend up">↑ 12% this week</span>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Depth Score</div>
+                        <div class="stat-value">94.2</div>
+                        <span class="stat-trend up">↑ 3.1 pts</span>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Avg. Elevation</div>
+                        <div class="stat-value">2.4</div>
+                        <span class="stat-trend down">↓ 0.2</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Recent Work</h3>
+                            <p class="section-desc">Projects using layered surfaces</p>
+                        </div>
+                    <div class="card table-card">
+                        <div class="table-head">
+                            <div>Project</div>
+                            <div>Status</div>
+                            <div>Team</div>
+                            <div>Depth</div>
+                        </div>
+                        <div class="table-body">
+                            <div class="table-row">
+                                <div><strong>Nova Dashboard</strong></div>
+                                <div><span class="badge badge-success">Active</span></div>
+                                <div>
+                                    <div class="avatar-stack">
+                                        <div class="avatar" style="background:#00BD7D">AK</div>
+                                        <div class="avatar" style="background:#0EA5E9">MR</div>
+                                    </div>
+                                <div>L3</div>
+                            </div>
+                            <div class="table-row">
+                                <div><strong>Perspective Mobile</strong></div>
+                                <div><span class="badge badge-warning">Review</span></div>
+                                <div>
+                                    <div class="avatar-stack">
+                                        <div class="avatar" style="background:#8B5CF6">SL</div>
+                                        <div class="avatar" style="background:#EC4899">JP</div>
+                                        <div class="avatar" style="background:#F59E0B">+2</div>
+                                    </div>
+                                <div>L2</div>
+                            </div>
+                            <div class="table-row">
+                                <div><strong>Atlas Design Lab</strong></div>
+                                <div><span class="badge badge-success">Active</span></div>
+                                <div>
+                                    <div class="avatar-stack">
+                                        <div class="avatar" style="background:#10B981">DT</div>
+                                    </div>
+                                <div>L4</div>
+                            </div>
+                            <div class="table-row">
+                                <div><strong>Quantum UI Kit</strong></div>
+                                <div><span class="badge badge-danger">Paused</span></div>
+                                <div>
+                                    <div class="avatar-stack">
+                                        <div class="avatar" style="background:#6366F1">KM</div>
+                                        <div class="avatar" style="background:#14B8A6">LW</div>
+                                    </div>
+                                <div>L1</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMPONENTS -->
+            <section id="components" class="tab-panel">
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Form Elements</h3>
+                            <p class="section-desc">Focus states use primary green ring</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="form-grid">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label" for="project">Project name</label>
+                                    <input class="input" id="project" type="text" placeholder="e.g. Perspective 2.0">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="elevation">Default elevation</label>
+                                    <select class="select" id="elevation">
+                                        <option>Level 1 - Subtle</option>
+                                        <option selected>Level 2 - Card</option>
+                                        <option>Level 3 - Floating</option>
+                                        <option>Level 4 - Modal</option>
+                                    </select>
+                                </div>
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label" for="notes">Description</label>
+                                    <input class="input" id="notes" type="text" placeholder="Brief description">
+                                </div>
+                                <div class="checkbox-wrap">
+                                    <input type="checkbox" id="notify" class="checkbox" checked>
+                                    <label for="notify" style="font-size:14px; cursor:pointer;">Enable depth animations</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="card">
+                        <div class="showcase">
+                            <div class="showcase-item">
+                                <h4>Badges</h4>
+                                <div class="showcase-row">
+                                    <span class="badge badge-success">Success</span>
+                                    <span class="badge badge-warning">Warning</span>
+                                    <span class="badge badge-danger">Danger</span>
+                                </div>
+                            </div>
+                            <div class="showcase-item">
+                                <h4>Chips</h4>
+                                <div class="showcase-row">
+                                    <span class="chip"><span class="chip-dot"></span>Primary</span>
+                                    <span class="chip">Design</span>
+                                    <span class="chip">System</span>
+                                </div>
+                            </div>
+                            <div class="showcase-item">
+                                <h4>Avatar Stack</h4>
+                                <div class="showcase-row">
+                                    <div class="avatar-stack">
+                                        <div class="avatar" style="background:#00BD7D">PD</div>
+                                        <div class="avatar" style="background:#111827">UX</div>
+                                        <div class="avatar" style="background:#6B7280">EN</div>
+                                        <div class="avatar" style="background:#F9FAFB; color:var(--muted); border:2px dashed #E5E7EB">+3</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="section-title">Depth Tokens</h3>
+                            <p class="section-desc">Use shadows to imply distance</p>
+                        </div>
+                    </div>
+                    <pre class="code-block"><code><span class="comment">/* Perspective elevation system */</span>
+<span class="prop">--shadow-1</span>: <span class="val">0 1px 2px rgba(0,0,0,0.05)</span>;   <span class="comment">/* resting */</span>
+<span class="prop">--shadow-2</span>: <span class="val">0 4px 6px rgba(0,0,0,0.07)</span>;   <span class="comment">/* card */</span>
+<span class="prop">--shadow-3</span>: <span class="val">0 10px 15px rgba(0,0,0,0.1)</span>;  <span class="comment">/* floating */</span>
+<span class="prop">--shadow-4</span>: <span class="val">0 20px 25px rgba(0,0,0,0.15)</span>; <span class="comment">/* modal */</span>
+
+<span class="prop">.card:hover</span> { <span class="prop">box-shadow</span>: <span class="val">var(--shadow-3)</span>; <span class="prop">transform</span>: <span class="val">translateY(-2px)</span>; }</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+            <h2 id="modalTitle">Level 4 Elevation</h2>
+            <p>This dialog floats above everything using our highest shadow. Notice the backdrop blur and the way the surface lifts off the page. Press ESC or click outside to dismiss.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="closeModalSecondary">Cancel</button>
+                <button class="btn btn-primary" id="closeModal">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <div class="toast-icon">✓</div>
+        <div>Depth preference saved</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tabs
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const panels = document.querySelectorAll('.tab-panel');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.tab;
+                    
+                    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === target));
+                    panels.forEach(p => p.classList.toggle('active', p.id === target));
+                    
+                    // Close mobile sidebar
+                    closeSidebar();
+                });
+            });
+
+            // Modal
+            const modal = document.getElementById('modal');
+            const openModalBtn = document.getElementById('openModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            const closeModalSecondary = document.getElementById('closeModalSecondary');
+
+            function openModal() {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                closeModalBtn.focus();
+            }
+            
+            function hideModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                openModalBtn.focus();
+            }
+
+            openModalBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', hideModal);
+            closeModalSecondary.addEventListener('click', hideModal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) hideModal();
+            });
+
+            // Toast
+            const toast = document.getElementById('toast');
+            const showToastBtn = document.getElementById('showToastBtn');
+            let toastTimer;
+
+            function showToast() {
+                clearTimeout(toastTimer);
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            showToastBtn.addEventListener('click', showToast);
+
+            // Sidebar mobile
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            const backdrop = document.getElementById('backdrop');
+
+            function openSidebar() {
+                sidebar.classList.add('open');
+                backdrop.classList.add('active');
+            }
+            
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('active');
+            }
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            });
+            
+            backdrop.addEventListener('click', closeSidebar);
+
+            // ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (modal.classList.contains('active')) hideModal();
+                    if (sidebar.classList.contains('open')) closeSidebar();
+                }
+            });
+
+            // Nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    closeSidebar();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
