@@ -2,18 +2,510 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>aistore.click</title>
-  <link rel="stylesheet" href="/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>AI Agent Skills · modular capabilities</title>
+  <!-- Font Awesome 6 for clean icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f5f7fc 0%, #eef1f8 100%);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      color: #1a1e2b;
+    }
+
+    .container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 3.5rem;
+      box-shadow: 0 30px 60px rgba(0, 10, 30, 0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+      padding: 2.5rem 2.8rem;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #0b1e33, #2c3e5c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+
+    h1 i {
+      background: none;
+      -webkit-text-fill-color: #2d4b6e;
+      font-size: 2.4rem;
+      background: linear-gradient(145deg, #1f3a57, #0e2137);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #4a5568;
+      margin-bottom: 2.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 450;
+      border-left: 4px solid #3b5c7a;
+      padding-left: 1.2rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0 2.5rem;
+    }
+
+    .benefit-card {
+      background: white;
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+      transition: all 0.25s ease;
+      border: 1px solid rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 25px 35px rgba(25, 45, 70, 0.12);
+      border-color: rgba(70, 110, 160, 0.25);
+    }
+
+    .benefit-icon {
+      font-size: 2.3rem;
+      color: #2c4b6b;
+      background: #e9f0fa;
+      width: 3.4rem;
+      height: 3.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1.4rem;
+    }
+
+    .benefit-card h3 {
+      font-weight: 600;
+      font-size: 1.35rem;
+      color: #0b253b;
+    }
+
+    .benefit-card p {
+      color: #475569;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .architecture-section {
+      background: #f8faff;
+      border-radius: 2.5rem;
+      padding: 2rem 2rem 1.8rem;
+      margin: 2.2rem 0;
+      border: 1px solid #dfe7f5;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9);
+    }
+
+    .level-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      justify-content: center;
+      margin-top: 1.8rem;
+    }
+
+    .level-box {
+      background: white;
+      border-radius: 1.8rem;
+      padding: 1.6rem 1.4rem;
+      flex: 1 1 200px;
+      min-width: 170px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+      transition: 0.2s;
+      border: 1px solid #e9eff6;
+      text-align: center;
+    }
+
+    .level-box:hover {
+      background: #ffffff;
+      border-color: #b7c9e2;
+      box-shadow: 0 18px 28px rgba(20, 50, 80, 0.08);
+    }
+
+    .level-number {
+      font-weight: 700;
+      font-size: 2rem;
+      color: #1f3b5c;
+      background: #e3ecf9;
+      width: 3rem;
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 0.8rem;
+    }
+
+    .interactive-demo {
+      background: #ffffff;
+      border-radius: 2rem;
+      padding: 2rem;
+      margin: 2.5rem 0 2rem;
+      border: 1px solid #e0e8f2;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.03);
+    }
+
+    .skill-folder {
+      background: #f2f5fc;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      align-items: center;
+      justify-content: center;
+      margin: 1.4rem 0;
+    }
+
+    .file-item {
+      background: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #dce3f0;
+    }
+
+    .file-item i {
+      color: #2f4b6e;
+    }
+
+    .file-item:hover {
+      background: #e3ebfa;
+      border-color: #6985aa;
+    }
+
+    .code-block {
+      background: #0f1a2b;
+      color: #d9e6ff;
+      padding: 1.3rem;
+      border-radius: 1.2rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      margin-top: 1.2rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    button {
+      background: #1e3349;
+      border: none;
+      color: white;
+      font-weight: 550;
+      padding: 0.8rem 1.8rem;
+      border-radius: 2.5rem;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 8px 18px rgba(20, 45, 70, 0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    button:hover {
+      background: #11273d;
+      box-shadow: 0 12px 24px rgba(10, 30, 55, 0.25);
+    }
+
+    .token-badge {
+      background: #e7edf8;
+      border-radius: 2rem;
+      padding: 0.25rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1f3147;
+    }
+
+    .disclosure-meter {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+
+    .progress-bg {
+      background: #e1e7f0;
+      height: 0.7rem;
+      border-radius: 1rem;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .progress-fill {
+      background: #27445c;
+      height: 100%;
+      border-radius: 1rem;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .footer-note {
+      margin-top: 2rem;
+      color: #4b5565;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width: 650px) {
+      .container {
+        padding: 1.8rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <nav>
-    <a href="/" data-link>Home</a>
-    <a href="/about" data-link>About</a>
-    <a href="/tool1" data-link>Tool 1</a>
-    <a href="/tool2" data-link>Tool 2</a>
-  </nav>
-  <main id="app">Loading...</main>
-  <script src="/router.js"></script>
+  <div class="container">
+    <h1>
+      <i class="fas fa-cubes"></i> Agent Skills
+    </h1>
+    <div class="subtitle">
+      <i class="fas fa-plug"></i> Modular capabilities that extend your AI assistant
+    </div>
+
+    <!-- Why use skills -->
+    <div class="card-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon"><i class="fas fa-microchip"></i></div>
+        <h3>Specialize instantly</h3>
+        <p>Turn a general assistant into a domain expert with packaged workflows, best practices, and tools.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><i class="fas fa-recycle"></i></div>
+        <h3>Reduce repetition</h3>
+        <p>Create once, use automatically. No more copying the same instructions across conversations.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><i class="fas fa-puzzle-piece"></i></div>
+        <h3>Compose capabilities</h3>
+        <p>Combine multiple Skills to build sophisticated, multi-step workflows effortlessly.</p>
+      </div>
+    </div>
+
+    <!-- Progressive disclosure architecture -->
+    <div class="architecture-section">
+      <h2 style="display: flex; gap:0.5rem; align-items: center; color: #152b40;">
+        <i class="fas fa-layer-group"></i> Progressive disclosure · three loading levels
+      </h2>
+      <div class="level-container">
+        <div class="level-box">
+          <div class="level-number">1</div>
+          <strong>Metadata</strong>
+          <p style="font-size:0.9rem; margin-top:0.4rem;">Always loaded at startup<br><span class="token-badge">~100 tokens</span></p>
+          <p style="color:#4b5563; font-size:0.85rem;">Name & description</p>
+        </div>
+        <div class="level-box">
+          <div class="level-number">2</div>
+          <strong>Instructions</strong>
+          <p style="font-size:0.9rem; margin-top:0.4rem;">Loaded when triggered<br><span class="token-badge">under 5k tokens</span></p>
+          <p style="color:#4b5563; font-size:0.85rem;">SKILL.md guidance</p>
+        </div>
+        <div class="level-box">
+          <div class="level-number">3+</div>
+          <strong>Resources & Code</strong>
+          <p style="font-size:0.9rem; margin-top:0.4rem;">Loaded as needed<br><span class="token-badge">effectively unlimited</span></p>
+          <p style="color:#4b5563; font-size:0.85rem;">Scripts, templates, docs</p>
+        </div>
+      </div>
+      <p style="margin-top: 1.5rem; color: #334155; font-style: italic;">
+        <i class="fas fa-lightbulb"></i> Only relevant content enters the context window – keeping it lean.
+      </p>
+    </div>
+
+    <!-- Interactive skill demo -->
+    <div class="interactive-demo">
+      <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+        <i class="fas fa-folder-tree" style="font-size: 1.8rem; color: #2d4968;"></i>
+        <h3 style="font-weight: 600;">📁 pdf-processing skill</h3>
+        <span class="token-badge"><i class="far fa-clock"></i> on-demand loading</span>
+      </div>
+      
+      <div class="skill-folder">
+        <div class="file-item" id="skillMdBtn"><i class="far fa-file-alt"></i> SKILL.md</div>
+        <div class="file-item" id="formsMdBtn"><i class="far fa-file"></i> FORMS.md</div>
+        <div class="file-item" id="refMdBtn"><i class="far fa-file-code"></i> REFERENCE.md</div>
+        <div class="file-item" id="scriptBtn"><i class="fas fa-terminal"></i> fill_form.py</div>
+      </div>
+
+      <div id="dynamicOutput" style="min-height: 100px; margin: 1rem 0; transition: 0.2s;">
+        <p style="color: #4b5563;"><i class="fas fa-info-circle"></i> Click any file to simulate how the AI loads content progressively.</p>
+      </div>
+
+      <div class="disclosure-meter">
+        <span style="font-weight: 600;"><i class="fas fa-chart-bar"></i> Context usage</span>
+        <div class="progress-bg">
+          <div id="contextProgress" class="progress-fill" style="width: 5%;"></div>
+        </div>
+        <span id="contextLabel" style="font-weight: 500;">~5%</span>
+      </div>
+      
+      <button id="simulateTaskBtn"><i class="fas fa-play"></i> Simulate: "Extract text from PDF"</button>
+      <p style="font-size:0.8rem; margin-top:0.6rem; color:#5e6f82;">The AI reads only what’s necessary – scripts run without loading code into context.</p>
+    </div>
+
+    <!-- Security & best practices note -->
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; background: #f4f7fd; border-radius: 2rem; padding: 1.5rem;">
+      <div style="flex:1;">
+        <h4 style="display: flex; gap:0.4rem;"><i class="fas fa-shield-alt"></i> Trusted sources</h4>
+        <p style="font-size:0.95rem; color:#2d3a4a;">Use Skills from verified creators. They can execute code – review scripts and external calls carefully.</p>
+      </div>
+      <div style="flex:1;">
+        <h4 style="display: flex; gap:0.4rem;"><i class="fas fa-sync-alt"></i> Works everywhere</h4>
+        <p style="font-size:0.95rem; color:#2d3a4a;">Available via API, desktop apps, and web interfaces. Skills are filesystem‑based directories.</p>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <span><i class="fas fa-check-circle"></i> Pre‑built skills: documents, spreadsheets, presentations</span>
+      <span><i class="fas fa-user-cog"></i> Custom skills: pack your own expertise</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // --- Interactive elements ---
+      const skillMdBtn = document.getElementById('skillMdBtn');
+      const formsMdBtn = document.getElementById('formsMdBtn');
+      const refMdBtn = document.getElementById('refMdBtn');
+      const scriptBtn = document.getElementById('scriptBtn');
+      const dynamicOutput = document.getElementById('dynamicOutput');
+      const contextProgress = document.getElementById('contextProgress');
+      const contextLabel = document.getElementById('contextLabel');
+      const simulateTaskBtn = document.getElementById('simulateTaskBtn');
+
+      // Simulated file contents
+      const fileContents = {
+        skillMd: {
+          title: "📄 SKILL.md (main instructions)",
+          content: `# PDF Processing\n\n## Quick start\nUse pdfplumber to extract text:\n\`\`\`python\nimport pdfplumber\nwith pdfplumber.open("doc.pdf") as pdf:\n    text = pdf.pages[0].extract_text()\n\`\`\`\nFor advanced forms, see FORMS.md.`,
+          tokens: "~2.1k tokens",
+          progress: 28
+        },
+        formsMd: {
+          title: "📑 FORMS.md (form-filling guide)",
+          content: `## Form filling workflow\n1. Load the PDF form\n2. Identify fields using acroform\n3. Map data and fill\n4. Save flattened copy.\nRefer to fill_form.py script.`,
+          tokens: "~1.4k tokens",
+          progress: 18
+        },
+        refMd: {
+          title: "📚 REFERENCE.md (API reference)",
+          content: `## pdfplumber API\n- extract_text()\n- extract_tables()\n- pages[].within_bbox()\nDetailed parameters for advanced extraction.`,
+          tokens: "~1.8k tokens",
+          progress: 20
+        },
+        script: {
+          title: "⚙️ fill_form.py (executable script)",
+          content: `# Script runs via bash – only output enters context.\n# Deterministic form filling.\nimport sys\nprint("Form filled successfully. 3 fields updated.")`,
+          tokens: "0 tokens (code not loaded)",
+          progress: 0
+        }
+      };
+
+      let currentProgress = 5; // base metadata
+
+      function updateUI(fileKey) {
+        const data = fileContents[fileKey];
+        if (!data) return;
+        
+        dynamicOutput.innerHTML = `
+          <div style="background:#f0f4fe; border-radius:1.2rem; padding:1.2rem; border-left:5px solid #2d4b6e;">
+            <strong style="font-size:1.1rem;">${data.title}</strong>
+            <span class="token-badge" style="margin-left:0.8rem;">${data.tokens}</span>
+            <div style="margin-top:0.8rem; white-space: pre-wrap; font-family: monospace; background:#ffffff; padding:0.8rem; border-radius:0.8rem;">${data.content}</div>
+          </div>
+        `;
+
+        // Update progress based on file (simulate additive context for demo)
+        if (fileKey === 'skillMd') {
+          currentProgress = 30;
+        } else if (fileKey === 'formsMd') {
+          currentProgress = 48;
+        } else if (fileKey === 'refMd') {
+          currentProgress = 65;
+        } else if (fileKey === 'script') {
+          // script execution doesn't increase context (or minimal)
+          currentProgress = Math.min(currentProgress + 2, 70);
+        }
+        
+        // Ensure progress between 5-100
+        currentProgress = Math.min(100, Math.max(5, currentProgress));
+        contextProgress.style.width = currentProgress + '%';
+        contextLabel.textContent = '~' + currentProgress + '%';
+      }
+
+      // Event listeners for file items
+      skillMdBtn.addEventListener('click', () => updateUI('skillMd'));
+      formsMdBtn.addEventListener('click', () => updateUI('formsMd'));
+      refMdBtn.addEventListener('click', () => updateUI('refMd'));
+      scriptBtn.addEventListener('click', () => updateUI('script'));
+
+      // Simulate full task: "extract text from pdf"
+      simulateTaskBtn.addEventListener('click', () => {
+        dynamicOutput.innerHTML = `
+          <div style="background:#e7f0fd; border-radius:1.2rem; padding:1.3rem;">
+            <i class="fas fa-robot" style="font-size:1.4rem; color:#1e3a5f;"></i>
+            <strong style="margin-left:0.5rem;">AI triggers skill: reads SKILL.md → extracts text</strong>
+            <p style="margin-top:0.7rem;"><i class="fas fa-check-circle" style="color:#1f5f3a;"></i> Used pdfplumber, skipped FORMS.md because task didn't need form filling.</p>
+            <p style="font-size:0.9rem; color:#2b4057;">Only necessary files loaded. Script reference available but not executed.</p>
+          </div>
+        `;
+        currentProgress = 32; // metadata + instructions loaded
+        contextProgress.style.width = currentProgress + '%';
+        contextLabel.textContent = '~' + currentProgress + '%';
+      });
+
+      // Set initial progress
+      contextProgress.style.width = '5%';
+      contextLabel.textContent = '~5%';
+    })();
+  </script>
 </body>
 </html>
